@@ -1,6 +1,6 @@
 package com.example.assignmentjavabootcamp.Response;
 
-import lombok.Data;
+
 
 
 public class CheckAuthenResponse {
