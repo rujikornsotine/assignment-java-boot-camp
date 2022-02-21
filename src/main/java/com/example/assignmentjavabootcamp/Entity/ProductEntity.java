@@ -12,29 +12,32 @@ import javax.persistence.Id;
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    int id;
-    String productid;
-    String productname;
-    String description;
-    String band;
-    String size;
-    String color;
-    int amount;
-    double price;
-    double discount;
-    String discountexpire;
-    String sex;
-    String type;
-    String imgpath1;
-    String imgpath2;
-    String imgpath3;
-    String imgpath4;
-    String imgpath5;
-    boolean recommend;
+    private int id;
+    private String productid;
+    private String productname;
+    private String description;
+    private String band;
+    private String size;
+    private String color;
+    private int amount;
+    private double price;
+    private double discount;
+    private String discountexpire;
+    private String sex;
+    private String type;
+    private String imgpath1;
+    private String imgpath2;
+    private String imgpath3;
+    private String imgpath4;
+    private String imgpath5;
+    private boolean recommend;
+
+    public ProductEntity() {
+    }
 
     public ProductEntity(String product_id, String product_name, String description, String band, String size, String color,
                          int amount, double price, double discount, String discount_expire, String sex, String type, String img_path_1,
-                         String img_path_2, String img_path_3, String img_path_4, String img_path_5,boolean recommend)
+                         String img_path_2, String img_path_3, String img_path_4, String img_path_5, boolean recommend)
     {
         this.productid = product_id;
         this.productname = product_name;

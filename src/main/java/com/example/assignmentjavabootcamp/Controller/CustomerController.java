@@ -23,7 +23,7 @@ public class CustomerController {
     @GetMapping("/getcustomerprofile/{username}")
     public ResponseEntity<CustomerRespones>  GetCustomerProfile(@PathVariable String username) throws CustomerException {
        Optional<CustomerEntity> result = customerService.GetCustomerProfileByUsername(username);
-       CustomerRespones customerRespones = new CustomerRespones(result.orElseThrow());
+       CustomerRespones customerRespones = new CustomerRespones(result.get());
        return ResponseEntity.ok(customerRespones);
     }
 

@@ -1,7 +1,9 @@
 package com.example.assignmentjavabootcamp;
 
+import com.example.assignmentjavabootcamp.Entity.CustomerEntity;
 import com.example.assignmentjavabootcamp.Entity.PaymentMethodEntity;
 import com.example.assignmentjavabootcamp.Entity.ProductEntity;
+import com.example.assignmentjavabootcamp.Repository.CustomerRepository;
 import com.example.assignmentjavabootcamp.Repository.PaymentMethodRepository;
 import com.example.assignmentjavabootcamp.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +18,15 @@ public class DataLoader implements ApplicationRunner {
     private ProductRepository productRepository;
     @Autowired
     private PaymentMethodRepository paymentMethodRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
 
 
     @Override
     public void run(ApplicationArguments args) {
         SetProductData();
+        SetPaymentMethodData();
+        SetCustomerData();
     }
 
     private void SetProductData() {
@@ -60,5 +66,21 @@ public class DataLoader implements ApplicationRunner {
         paymentMethodRepository.save(new PaymentMethodEntity("PM001","CreditorDebit","01","/image1.jpg"));
         paymentMethodRepository.save(new PaymentMethodEntity("PM002","CounterService","02","/image1.jpg"));
         paymentMethodRepository.save(new PaymentMethodEntity("PM002","COD","03","/image1.jpg"));
+    }
+
+    private void  SetCustomerData(){
+        CustomerEntity customerEntity1 = new CustomerEntity();
+        customerEntity1.setCustid("CustMock001");
+        customerEntity1.setAddress("123/456 ต.บางเมือง อ.เมืองสมุทรปราการ จ.สมุทรปราการ 10270");
+        customerEntity1.setFirstname("Test01");
+        customerEntity1.setLastname("Test01");
+        customerEntity1.setUsername("CustMock001");
+        customerEntity1.setMobileno("0800000000");
+        customerEntity1.setEmail("CustMock001@gmail.com");
+        customerEntity1.setDistrict("บางเมือง");
+        customerEntity1.setSub_district("เมืองสมุทรปราการ");
+        customerEntity1.setProvince("สมุทรปราการ");
+        customerEntity1.setZipcode("10270");
+        customerRepository.save(customerEntity1);
     }
 }

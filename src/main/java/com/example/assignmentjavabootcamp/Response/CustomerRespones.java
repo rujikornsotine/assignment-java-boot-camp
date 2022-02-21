@@ -1,19 +1,21 @@
 package com.example.assignmentjavabootcamp.Response;
 
 import com.example.assignmentjavabootcamp.Entity.CustomerEntity;
+import lombok.Data;
 
+@Data
 public class CustomerRespones {
-    String custid;
-    String firstname;
-    String lastname;
-    String username;
-    String email;
-    String address;
-    String mobileno;
-    String district;
-    String sub_district;
-    String province;
-    String zipcode;
+    private String custid;
+    private String firstname;
+    private String lastname;
+    private String username;
+    private String email;
+    private String address;
+    private String mobileno;
+    private String district;
+    private String sub_district;
+    private String province;
+    private String zipcode;
 
     public CustomerRespones() {
     }
