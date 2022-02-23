@@ -13,9 +13,7 @@ public class SessionEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
-    private String Sessionid;
     private String SessionRef;
     private String SessionData;
     private String FlowName;
-
 }

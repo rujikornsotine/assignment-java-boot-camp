@@ -1,8 +1,10 @@
 package com.example.assignmentjavabootcamp;
 
+import com.example.assignmentjavabootcamp.Entity.Coupon;
 import com.example.assignmentjavabootcamp.Entity.CustomerEntity;
 import com.example.assignmentjavabootcamp.Entity.PaymentMethodEntity;
 import com.example.assignmentjavabootcamp.Entity.ProductEntity;
+import com.example.assignmentjavabootcamp.Repository.CouponRepository;
 import com.example.assignmentjavabootcamp.Repository.CustomerRepository;
 import com.example.assignmentjavabootcamp.Repository.PaymentMethodRepository;
 import com.example.assignmentjavabootcamp.Repository.ProductRepository;
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 public class DataLoader implements ApplicationRunner {
@@ -20,6 +24,9 @@ public class DataLoader implements ApplicationRunner {
     private PaymentMethodRepository paymentMethodRepository;
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private CouponRepository couponRepository;
 
 
     @Override
@@ -83,4 +90,25 @@ public class DataLoader implements ApplicationRunner {
         customerEntity1.setZipcode("10270");
         customerRepository.save(customerEntity1);
     }
+
+    private void  SetCouponData(){
+        Coupon coupon = new Coupon();
+        coupon.setCouponcode("123456789");
+        coupon.setCouponname("Couponส่วนลด200บาท");
+        coupon.setIsexpire(false);
+        coupon.setCreatedate(LocalDateTime.now());
+        coupon.setExpdate(LocalDateTime.now().plusDays(20));
+        coupon.setDiscount(200);
+        couponRepository.save(coupon);
+
+        Coupon coupon2 = new Coupon();
+        coupon2.setCouponcode("1111122222");
+        coupon2.setCouponname("Couponส่วนลด50บาท");
+        coupon2.setIsexpire(false);
+        coupon2.setCreatedate(LocalDateTime.now());
+        coupon2.setExpdate(LocalDateTime.now().plusDays(20));
+        coupon2.setDiscount(50);
+        couponRepository.save(coupon2);
+    }
+
 }
