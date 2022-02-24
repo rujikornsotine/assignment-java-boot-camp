@@ -1,6 +1,7 @@
 package com.example.assignmentjavabootcamp.Service;
 
 import com.example.assignmentjavabootcamp.Entity.*;
+import com.example.assignmentjavabootcamp.Exception.CouponException;
 import com.example.assignmentjavabootcamp.Exception.PaymentException;
 import com.example.assignmentjavabootcamp.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,12 +101,12 @@ public class PaymentService {
         List<ItemPayment> optionalItemPayment = itemPaymentRepository.findByUsernameAndPaymentrefnumber(username,refnumber);
 
         if(paymentEntity.isEmpty()){
-            throw PaymentException.PaymentInvalidFlow();
+            throw PaymentException.PaymentMethodNotFound();
         }
 
         if(paymentEntity.isPresent() ){
             payment = paymentEntity.get();
-            if(!payment.getRefnumber().equalsIgnoreCase(PaymentFlow.PRE_PAYMENT.toString())){
+            if(!payment.getPaymentflow().equalsIgnoreCase(PaymentFlow.PRE_PAYMENT.toString())){
                 throw PaymentException.PaymentInvalidFlow();
             }
         }
@@ -144,7 +145,7 @@ public class PaymentService {
         }
 
 
-        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireTrue(couponcode,LocalDateTime.now());
+        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireFalse(couponcode,LocalDateTime.now());
 
         if(paymentMethodEntity.isPresent()){
             Coupon _coupon = coupon.get();
@@ -153,13 +154,22 @@ public class PaymentService {
 
         paymentRepository.save(payment);
 
+
         return payment;
 
     }
 
-    public boolean CheckCoupon(String couponcode){
-        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireTrue(couponcode,LocalDateTime.now());
-        return coupon.isPresent();
+    public Coupon CheckCoupon(String couponcode) throws CouponException {
+        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireFalse(couponcode,LocalDateTime.now());
+        if(coupon.isEmpty()){
+            throw CouponException.CouponNotFoundorExpire();
+        }
+
+        return coupon.get();
+    }
+
+    public List<PaymentMethodEntity> ListPaymentMethod(){
+        return  paymentMethodRepository.findAll();
     }
 
     private String GenarateRefPayment() {

@@ -9,5 +9,5 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface CouponRepository extends JpaRepository<Coupon,Integer> {
-    Optional<Coupon> findByCouponcodeAndExpdateAfterAndIsexpireTrue(String couponcode, LocalDateTime dateTime);
+    Optional<Coupon> findByCouponcodeAndExpdateAfterAndIsexpireFalse(String couponcode, LocalDateTime dateTime);
 }

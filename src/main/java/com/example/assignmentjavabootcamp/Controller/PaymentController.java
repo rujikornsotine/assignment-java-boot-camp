@@ -1,11 +1,11 @@
 package com.example.assignmentjavabootcamp.Controller;
 
-import com.example.assignmentjavabootcamp.Entity.AddressEntity;
-import com.example.assignmentjavabootcamp.Entity.PaymentEntity;
-import com.example.assignmentjavabootcamp.Entity.PurchaseEntity;
+import com.example.assignmentjavabootcamp.Entity.*;
+import com.example.assignmentjavabootcamp.Exception.CouponException;
 import com.example.assignmentjavabootcamp.Exception.PaymentException;
 import com.example.assignmentjavabootcamp.Request.ComfirmPaymentRequest;
 import com.example.assignmentjavabootcamp.Request.PaymentRequest;
+import com.example.assignmentjavabootcamp.Response.CouponRespones;
 import com.example.assignmentjavabootcamp.Service.PaymentService;
 import com.example.assignmentjavabootcamp.Service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,19 +35,23 @@ public class PaymentController {
         return ResponseEntity.ok(payment);
     }
 
+    @GetMapping("/CheckCoupon/{couponcode}")
+    public HttpEntity<CouponRespones> CheckCoupon(@PathVariable String couponcode) throws CouponException {
+        Coupon result =  paymentService.CheckCoupon(couponcode);
+        return ResponseEntity.ok(new CouponRespones(result.getCouponcode(),result.getDiscount(),result.getCouponname(),result.getDescription()));
+    }
+
+    @GetMapping("/listpaymentmethod")
+    public HttpEntity<List<PaymentMethodEntity>> ListPaymentMethod()  {
+        List<PaymentMethodEntity> result =  paymentService.ListPaymentMethod();
+        return ResponseEntity.ok(result);
+    }
+
+
+
     @GetMapping("/test")
-    public PaymentRequest testPaymentRequest() {
-        PaymentRequest res = new PaymentRequest();
-        AddressEntity address = new AddressEntity();
-        address.setAddress("test");
-        address.setFullAddress("test");
-        address.setDistrict("test");
-        address.setSubdistrict("test");
-        address.setZipcode("10270");
-        address.setProvince("สมุทรปราการ");
-        res.setAddress(address);
-        List<PurchaseEntity> purchaseEntityList = purchaseService.GetAll();
-        res.setPurchaseList(purchaseEntityList);
+    public ComfirmPaymentRequest testPaymentRequest() {
+        ComfirmPaymentRequest res = new ComfirmPaymentRequest();
         return res;
     }
 

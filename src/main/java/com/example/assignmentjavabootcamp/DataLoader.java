@@ -34,6 +34,7 @@ public class DataLoader implements ApplicationRunner {
         SetProductData();
         SetPaymentMethodData();
         SetCustomerData();
+        SetCouponData();
     }
 
     private void SetProductData() {
@@ -72,7 +73,7 @@ public class DataLoader implements ApplicationRunner {
     private void SetPaymentMethodData() {
         paymentMethodRepository.save(new PaymentMethodEntity("PM001","CreditorDebit","01","/image1.jpg"));
         paymentMethodRepository.save(new PaymentMethodEntity("PM002","CounterService","02","/image1.jpg"));
-        paymentMethodRepository.save(new PaymentMethodEntity("PM002","COD","03","/image1.jpg"));
+        paymentMethodRepository.save(new PaymentMethodEntity("PM003","COD","03","/image1.jpg"));
     }
 
     private void  SetCustomerData(){
