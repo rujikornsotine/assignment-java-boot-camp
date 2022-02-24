@@ -1,13 +1,7 @@
 package com.example.assignmentjavabootcamp;
 
-import com.example.assignmentjavabootcamp.Entity.Coupon;
-import com.example.assignmentjavabootcamp.Entity.CustomerEntity;
-import com.example.assignmentjavabootcamp.Entity.PaymentMethodEntity;
-import com.example.assignmentjavabootcamp.Entity.ProductEntity;
-import com.example.assignmentjavabootcamp.Repository.CouponRepository;
-import com.example.assignmentjavabootcamp.Repository.CustomerRepository;
-import com.example.assignmentjavabootcamp.Repository.PaymentMethodRepository;
-import com.example.assignmentjavabootcamp.Repository.ProductRepository;
+import com.example.assignmentjavabootcamp.Entity.*;
+import com.example.assignmentjavabootcamp.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -18,6 +12,8 @@ import java.time.LocalDateTime;
 @Component
 public class DataLoader implements ApplicationRunner {
 
+    @Autowired
+    private AuthenRepository authenRepository;
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -31,6 +27,8 @@ public class DataLoader implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+
+        authenRepository.save(new AuthenEntity("CustMock001"));
         SetProductData();
         SetPaymentMethodData();
         SetCustomerData();

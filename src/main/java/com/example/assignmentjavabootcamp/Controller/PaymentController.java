@@ -24,25 +24,25 @@ public class PaymentController {
     private PurchaseService purchaseService;
 
     @PostMapping("/prepayment")
-    public HttpEntity<PaymentEntity> PrePayment(@RequestBody PaymentRequest request) throws PaymentException {
+    public ResponseEntity<PaymentEntity> PrePayment(@RequestBody PaymentRequest request) throws PaymentException {
         PaymentEntity payment = paymentService.Prepayment(request.getUsername(), request.getAddress(), request.getPurchaseList());
         return ResponseEntity.ok(payment);
     }
 
     @PostMapping("/confirmpayment")
-    public HttpEntity<PaymentEntity> ConfirmPayment(@RequestBody ComfirmPaymentRequest request) throws PaymentException {
+    public ResponseEntity<PaymentEntity> ConfirmPayment(@RequestBody ComfirmPaymentRequest request) throws PaymentException {
         PaymentEntity payment = paymentService.ConfirmPayment(request.getUsername(), request.getCouponcode(), request.getRefnumber(), request.getPaymentmethodid(), request.getAccountnumber(), request.getAccountname(), request.getAccountexpire(), request.getCvv());
         return ResponseEntity.ok(payment);
     }
 
     @GetMapping("/CheckCoupon/{couponcode}")
-    public HttpEntity<CouponRespones> CheckCoupon(@PathVariable String couponcode) throws CouponException {
+    public ResponseEntity<CouponRespones> CheckCoupon(@PathVariable String couponcode) throws CouponException {
         Coupon result =  paymentService.CheckCoupon(couponcode);
         return ResponseEntity.ok(new CouponRespones(result.getCouponcode(),result.getDiscount(),result.getCouponname(),result.getDescription()));
     }
 
     @GetMapping("/listpaymentmethod")
-    public HttpEntity<List<PaymentMethodEntity>> ListPaymentMethod()  {
+    public ResponseEntity<List<PaymentMethodEntity>> ListPaymentMethod()  {
         List<PaymentMethodEntity> result =  paymentService.ListPaymentMethod();
         return ResponseEntity.ok(result);
     }

@@ -12,10 +12,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentService {
 
+    @Autowired
+    private AuthenRepository authenRepository;
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
@@ -49,14 +52,19 @@ public class PaymentService {
             throw PaymentException.CustomerNotFound();
         }
 
-        List<PaymentMethodEntity> paymentMethodList = paymentMethodRepository.findAll();
-
-        if (paymentMethodList.isEmpty()) {
-            throw PaymentException.PaymentMethodNotFound();
+        Optional<AuthenEntity> authenEntity = authenRepository.findByUsername(username);
+        if (authenEntity.isEmpty()) {
+            throw PaymentException.Pleaselogin();
         }
 
         PaymentEntity paymentEntity = new PaymentEntity();
         CustomerEntity cust = customer.get();
+
+        if(purchaseList.size() > 0 ){
+           long count = purchaseList.stream().filter( x -> x.getProductid() == null).count();
+           if(count > 0)
+               PaymentException.ProductNotFound();
+        }
 
         double amount = purchaseList.stream().mapToDouble(x -> x.getActual_price()).sum();
         String refnumber = GenarateRefPayment();

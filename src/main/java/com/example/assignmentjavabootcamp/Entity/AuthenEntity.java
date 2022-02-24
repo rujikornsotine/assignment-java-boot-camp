@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -17,7 +18,15 @@ public class AuthenEntity {
     private int id;
     private String username;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private Date loginDate;
+    private LocalDateTime loginDate;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private Date loginTimeout;
+    private LocalDateTime loginTimeout;
+
+    public AuthenEntity() {
+    }
+
+    public AuthenEntity(String username) {
+        this.username = username;
+        this.loginDate = LocalDateTime.now();
+    }
 }

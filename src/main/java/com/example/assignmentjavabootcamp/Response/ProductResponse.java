@@ -25,6 +25,9 @@ public class ProductResponse {
     private String imgpath4;
     private String imgpath5;
 
+    public ProductResponse() {
+    }
+
     public ProductResponse(ProductEntity productEntityList){
         this.productid = productEntityList.getProductid();
         this.productname = productEntityList.getProductname();

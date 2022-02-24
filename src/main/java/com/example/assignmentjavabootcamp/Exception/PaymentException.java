@@ -29,4 +29,8 @@ public class PaymentException extends  BaseException {
         return new PaymentException("Payment invalid flow.","PM005");
     }
 
+    public static PaymentException Pleaselogin(){
+        return new PaymentException("Please login.","PM007");
+    }
+
 }

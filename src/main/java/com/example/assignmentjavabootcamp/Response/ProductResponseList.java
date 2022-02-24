@@ -11,6 +11,9 @@ import java.util.List;
 public class ProductResponseList {
     private List<ProductResponse>  productResponseList;
 
+    public ProductResponseList() {
+    }
+
     public ProductResponseList(List<ProductEntity> productEntityList){
 
         productResponseList = new ArrayList<ProductResponse>();
