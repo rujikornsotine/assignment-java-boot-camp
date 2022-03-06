@@ -20,7 +20,7 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
-    @GetMapping("/getcustomerprofile/{username}")
+    @GetMapping("/getprofile/{username}")
     public ResponseEntity<CustomerRespones>  GetCustomerProfile(@PathVariable String username) throws CustomerException {
        Optional<CustomerEntity> result = customerService.GetCustomerProfileByUsername(username);
        CustomerRespones customerRespones = new CustomerRespones(result.get());

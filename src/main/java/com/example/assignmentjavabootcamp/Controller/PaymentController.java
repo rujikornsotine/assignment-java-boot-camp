@@ -48,12 +48,4 @@ public class PaymentController {
     }
 
 
-
-    @GetMapping("/test")
-    public ComfirmPaymentRequest testPaymentRequest() {
-        ComfirmPaymentRequest res = new ComfirmPaymentRequest();
-        return res;
-    }
-
-
 }

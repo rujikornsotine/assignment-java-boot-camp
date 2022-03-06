@@ -16,7 +16,7 @@ public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
 
-    @PostMapping("/additemproduct")
+    @PostMapping("/addproduct")
     public ResponseEntity AddItemProduct(@RequestBody ItemProductRequest request) throws PurchaseException {
         purchaseService.AddPurchase(request.getUsername(),request.getProductid(),request.getAmount());
         return  ResponseEntity.ok().build();
@@ -32,13 +32,13 @@ public class PurchaseController {
         return ResponseEntity.ok(purchaseService.ListByUsername(username)) ;
     }
 
-    @PostMapping("/edititemproduct")
+    @PostMapping("/editproduct")
     public ResponseEntity EdittemProduct(@RequestBody ItemProductRequest request) throws PurchaseException {
         purchaseService.EditPurchase(request.getUsername(),request.getProductid(),request.getAmount(),request.getId());
         return  ResponseEntity.ok().build();
     }
 
-    @PostMapping("/deleteitemproduct")
+    @PostMapping("/deleteproduct")
     public ResponseEntity DeletetemProduct(@RequestBody ItemProductRequest request) throws PurchaseException {
         purchaseService.DeletePurchase(request.getUsername(),request.getProductid(),request.getId());
         return  ResponseEntity.ok().build();

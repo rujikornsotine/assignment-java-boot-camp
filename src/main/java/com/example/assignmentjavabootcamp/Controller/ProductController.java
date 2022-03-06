@@ -22,7 +22,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @GetMapping("/listproductbyrecommend")
+    @GetMapping("/listbyrecommend")
     public ResponseEntity<ProductResponseList> ListproductByRecommend() throws ProductException {
 
         Optional<List<ProductEntity>> productList = productService.ListProductByRecommend();
@@ -30,7 +30,7 @@ public class ProductController {
         return ResponseEntity.ok(_productList);
     }
 
-    @GetMapping("/listproductbykeyword/{keyword}")
+    @GetMapping("/listbykeyword/{keyword}")
     public ResponseEntity<ProductResponseList> ListproductByKeyword(@PathVariable String keyword) throws ProductException {
 
         Optional<List<ProductEntity>> productList = productService.ListProductByKeyword(keyword);
@@ -38,7 +38,7 @@ public class ProductController {
         return ResponseEntity.ok(_productList);
     }
 
-    @GetMapping("/getproductbyid/{productid}")
+    @GetMapping("/getbyid/{productid}")
     public ResponseEntity<ProductResponse> GetProductByID(@PathVariable String productid) throws ProductException {
 
         Optional<ProductEntity> productEntity = productService.GetProductByID(productid);
@@ -46,7 +46,7 @@ public class ProductController {
         return ResponseEntity.ok(_product);
     }
 
-    @GetMapping("/listproductbysellproductgroup/{band}/{productid}")
+    @GetMapping("/listbysellproductgroup/{band}/{productid}")
     public ResponseEntity<ProductResponseList> ListProductBysellProductGroup(@PathVariable String band,@PathVariable String productid) throws ProductException {
         Optional<List<ProductEntity>> productList = productService.ListProductBysellProductGroup(band,productid);
         ProductResponseList _products = new ProductResponseList(productList.orElseThrow());
