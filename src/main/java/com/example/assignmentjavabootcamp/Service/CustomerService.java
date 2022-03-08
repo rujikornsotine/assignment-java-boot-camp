@@ -14,6 +14,11 @@ public class CustomerService {
     @Autowired
     CustomerRepository customerRepository;
 
+    public void setCustomerRepository(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
+
     public Optional<CustomerEntity> GetCustomerProfileByUsername(String username) throws CustomerException {
 
         Optional<CustomerEntity> customerEntity = customerRepository.findByUsername(username);

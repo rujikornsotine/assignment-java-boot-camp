@@ -20,17 +20,21 @@ class CustomerControllerTest {
     @Autowired
     TestRestTemplate testRestTemplate;
 
+    private final String url = "/api/customer/getprofile/";
+
     @Test
     @DisplayName("ทดสอบการดึงข้อมูลของ customer ที่มี Profile ในระบบ")
     void getCustomerProfile() {
-        CustomerRespones respones = testRestTemplate.getForObject("/api/customer/getcustomerprofile/CustMock001", CustomerRespones.class);
-        assertEquals(respones.getUsername(),"CustMock001");
+        String username = "CustMock001";
+        CustomerRespones respones = testRestTemplate.getForObject(url+username, CustomerRespones.class);
+        assertEquals(respones.getUsername(),username);
     }
 
     @Test
     @DisplayName("ทดสอบการดึงข้อมูลของ customer ที่ไม่มี Data Profile ในระบบ")
     void getCustomerNotProfile() {
-        ErrorRespones respones = testRestTemplate.getForObject("/api/customer/getcustomerprofile/CustMock002", ErrorRespones.class);
+        String username = "CustMock002";
+        ErrorRespones respones = testRestTemplate.getForObject(url+username, ErrorRespones.class);
         assertEquals(respones.getErrorCode(),"0005");
         assertEquals(respones.getErrorMessage(),"CustomerException : Username CustMock002 Not Found.");
     }

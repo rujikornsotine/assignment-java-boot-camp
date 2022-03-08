@@ -9,6 +9,7 @@ import com.example.assignmentjavabootcamp.Repository.ProductRepository;
 import com.example.assignmentjavabootcamp.Repository.PurchaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,8 @@ public class PurchaseService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    public void AddPurchase(String username,String productid,int amount) throws PurchaseException{
-        AddorUpdatePurchase(username,productid,amount,0);
+    public boolean AddPurchase(String username,String productid,int amount) throws PurchaseException{
+       return  AddorUpdatePurchase(username,productid,amount,0);
     }
 
     public List<PurchaseEntity> ListByUsername(String uername) throws PurchaseException {
@@ -42,19 +43,21 @@ public class PurchaseService {
         return  resultPurchaseList;
     }
 
-    public void EditPurchase (String username,String productid,int amount,int id) throws PurchaseException{
+    public boolean EditPurchase (String username,String productid,int amount,int id) throws PurchaseException{
 
         if(id <= 0)
         {
             throw PurchaseException.ParameterIsNotVaild("ID");
         }
 
-        AddorUpdatePurchase(username,productid,amount,id);
+       return AddorUpdatePurchase(username,productid,amount,id);
 
     }
 
-    private void AddorUpdatePurchase(String username,String productid,int amount,int id) throws PurchaseException{
+
+    private boolean AddorUpdatePurchase(String username,String productid,int amount,int id) throws PurchaseException{
         PurchaseEntity purchase = new PurchaseEntity();
+        boolean result = true;
         double actual_price = 0.00;
         double price_summary = 0.00;
 
@@ -119,7 +122,11 @@ public class PurchaseService {
             purchase.setDiscount(item.getDiscount());
             purchase.setSum_price(price_summary);
             purchaseRepository.save(purchase);
+
+
         }
+
+        return  result;
     }
 
     public List<PurchaseEntity> GetAll() {

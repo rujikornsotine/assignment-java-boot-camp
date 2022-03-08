@@ -32,6 +32,40 @@ public class PaymentService {
     @Autowired
     private CouponRepository couponRepository;
 
+    public void setAuthenRepository(AuthenRepository authenRepository) {
+        this.authenRepository = authenRepository;
+    }
+
+    public void setCustomerRepository(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
+    public void setPaymentMethodRepository(PaymentMethodRepository paymentMethodRepository) {
+        this.paymentMethodRepository = paymentMethodRepository;
+    }
+
+    public void setPaymentRepository(PaymentRepository paymentRepository) {
+        this.paymentRepository = paymentRepository;
+    }
+
+    public void setAddressPaymentRepository(AddressPaymentRepository addressPaymentRepository) {
+        this.addressPaymentRepository = addressPaymentRepository;
+    }
+
+    public void setItemPaymentRepository(ItemPaymentRepository itemPaymentRepository) {
+        this.itemPaymentRepository = itemPaymentRepository;
+    }
+
+    public void setCouponRepository(CouponRepository couponRepository) {
+        this.couponRepository = couponRepository;
+    }
+
+    private LocalDateTime dateTime;
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
     @Transactional
     public PaymentEntity Prepayment(String username, AddressEntity address, List<PurchaseEntity> purchaseList) throws PaymentException {
 
@@ -152,8 +186,10 @@ public class PaymentService {
             payment.setPaymentflow(PaymentFlow.CONFIRM_PAYMENT.toString());
         }
 
-
-        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireFalse(couponcode,LocalDateTime.now());
+        if(dateTime == null){
+            dateTime = LocalDateTime.now();
+        }
+        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireFalse(couponcode,dateTime);
 
         if(paymentMethodEntity.isPresent()){
             Coupon _coupon = coupon.get();
@@ -168,7 +204,10 @@ public class PaymentService {
     }
 
     public Coupon CheckCoupon(String couponcode) throws CouponException {
-        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireFalse(couponcode,LocalDateTime.now());
+        if(dateTime == null){
+            dateTime = LocalDateTime.now();
+        }
+        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireFalse(couponcode,dateTime);
         if(coupon.isEmpty()){
             throw CouponException.CouponNotFoundorExpire();
         }

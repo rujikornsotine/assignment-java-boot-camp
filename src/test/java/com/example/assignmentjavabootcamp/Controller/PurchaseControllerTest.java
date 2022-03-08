@@ -28,58 +28,61 @@ class PurchaseControllerTest {
     @Mock
     PurchaseRepository purchaseRepository;
 
+    private final String listbynameUrl = "/api/purchase/listbyusername/";
+
     @Test
     @DisplayName("ทดสอบ Flow Cart 1.add สินค้า 2.เช็คสินค้า" )
     void ADDFlowCart() {
 
+        String username = "CustMock001";
+        String productid = "PD0003";
         //ADD item in Cart
         ItemProductRequest request = new ItemProductRequest();
-        request.setUsername("CustMock001");
-        request.setProductid("PD0003");
+        request.setUsername(username);
+        request.setProductid(productid);
         request.setAmount(2);
 
-        ResponseEntity httpEntity = testRestTemplate.postForEntity("/api/purchase/additemproduct",request, ResponseEntity.class);
+        ResponseEntity httpEntity = testRestTemplate.postForEntity("/api/purchase/addproduct",request, ResponseEntity.class);
 
         assertEquals(httpEntity.getStatusCode(), HttpStatus.OK);
 
         //List item in cart
-        PurchaseEntity[] responesGet = testRestTemplate.getForObject("/api/purchase/listbyusername/CustMock001", PurchaseEntity[].class);
-        PurchaseEntity purchase =  Arrays.stream(responesGet).filter( x -> x.getProductid().equalsIgnoreCase("PD0003")).findAny().orElse(null);
-        assertEquals(purchase.getUsername(),"CustMock001");
+        PurchaseEntity[] responesGet = testRestTemplate.getForObject(listbynameUrl + username, PurchaseEntity[].class);
+        PurchaseEntity purchase =  Arrays.stream(responesGet).filter( x -> x.getProductid().equalsIgnoreCase(productid)).findAny().orElse(null);
+        assertEquals(purchase.getUsername(),username);
 
 
         // Edit
         ItemProductRequest requestEdit = new ItemProductRequest();
-        requestEdit.setUsername("CustMock001");
-        requestEdit.setProductid("PD0003");
+        requestEdit.setUsername(username);
+        requestEdit.setProductid(productid);
         requestEdit.setAmount(5);
         requestEdit.setId(purchase.getId());
 
-        ResponseEntity responesEdit = testRestTemplate.postForEntity("/api/purchase/edititemproduct", requestEdit, HttpEntity.class);
+        ResponseEntity responesEdit = testRestTemplate.postForEntity("/api/purchase/editproduct", requestEdit, HttpEntity.class);
         assertEquals(responesEdit.getStatusCode(), HttpStatus.OK);
 
-        PurchaseEntity[] responesGetEdit  = testRestTemplate.getForObject("/api/purchase/listbyusername/CustMock001", PurchaseEntity[].class);
+        PurchaseEntity[] responesGetEdit  = testRestTemplate.getForObject(listbynameUrl + username, PurchaseEntity[].class);
 
-        PurchaseEntity purchaseEdit =  Arrays.stream(responesGetEdit).filter( x -> x.getProductid().equalsIgnoreCase("PD0003")).findAny().orElse(null);
+        PurchaseEntity purchaseEdit =  Arrays.stream(responesGetEdit).filter( x -> x.getProductid().equalsIgnoreCase(productid)).findAny().orElse(null);
 
         assertEquals(purchaseEdit.getAmount(),5);
 
         //Delete
         ItemProductRequest requestDelete = new ItemProductRequest();
-        requestEdit.setUsername("CustMock001");
-        requestEdit.setProductid("PD0003");
+        requestEdit.setUsername(username);
+        requestEdit.setProductid(productid);
         requestEdit.setAmount(5);
         requestEdit.setId(purchase.getId());
 
-        ResponseEntity responesDelete = testRestTemplate.postForEntity("/api/purchase/deleteitemproduct", requestEdit, HttpEntity.class);
+        ResponseEntity responesDelete = testRestTemplate.postForEntity("/api/purchase/deleteproduct", requestEdit, HttpEntity.class);
         assertEquals(responesEdit.getStatusCode(), HttpStatus.OK);
 
-        PurchaseEntity[] responesGetDelete = testRestTemplate.getForObject("/api/purchase/listbyusername/CustMock001", PurchaseEntity[].class);
+        PurchaseEntity[] responesGetDelete = testRestTemplate.getForObject(listbynameUrl + username, PurchaseEntity[].class);
 
-        PurchaseEntity purchaseDelete =  Arrays.stream(responesGetDelete).filter( x -> x.getProductid().equalsIgnoreCase("PD0003")).findAny().orElse(null);
+        PurchaseEntity purchaseDelete =  Arrays.stream(responesGetDelete).filter( x -> x.getProductid().equalsIgnoreCase(productid)).findAny().orElse(null);
 
         assertEquals(purchaseDelete == null,true);
-
 
 
     }

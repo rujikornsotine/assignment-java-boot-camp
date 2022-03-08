@@ -13,6 +13,10 @@ public class AuthenService {
     @Autowired
     AuthenRepository authenRepository;
 
+    public void setAuthenRepository(AuthenRepository authenRepository) {
+        this.authenRepository = authenRepository;
+    }
+
     public Boolean CheckUserAuthen(String username) {
         boolean isAuthed;
         Optional<AuthenEntity> result = authenRepository.findByUsername(username);

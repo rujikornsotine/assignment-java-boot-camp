@@ -1,4 +1,4 @@
-package Enum;
+package com.example.assignmentjavabootcamp.Enum;
 
 public enum PaymentFlow {
     PRE_PAYMENT,

@@ -30,17 +30,23 @@ class PaymentControllerTest {
     @Autowired
     TestRestTemplate testRestTemplate;
 
-    @Test
-    @DisplayName("ทดสอบการเช็ค Coupon ที่มีในระบบ")
-    void checkCouponSuccess() {
-        CouponRespones respones = testRestTemplate.getForObject("/api/payment/CheckCoupon/1111122222", CouponRespones.class);
-        assertEquals(respones.getCouponcode(),"1111122222");
-    }
+    private final String conponUrl = "/api/payment/CheckCoupon/";
+    private final String paymentmethodUrl = "/api/payment/listpaymentmethod";
+    private final String prepaymenUrl = "/api/payment/prepayment";
 
     @Test
     @DisplayName("ทดสอบการเช็ค Coupon ที่มีในระบบ")
+    void checkCouponSuccess() {
+        String couponCode = "1111122222";
+        CouponRespones respones = testRestTemplate.getForObject(conponUrl + couponCode, CouponRespones.class);
+        assertEquals(respones.getCouponcode(),couponCode);
+    }
+
+    @Test
+    @DisplayName("ทดสอบการเช็ค Coupon ที่ไม่มีในระบบ")
     void checkCouponFail() {
-        ErrorRespones respones = testRestTemplate.getForObject("/api/payment/CheckCoupon/1212121212", ErrorRespones.class);
+        String couponCode = "11111222223333";
+        ErrorRespones respones = testRestTemplate.getForObject(conponUrl + couponCode, ErrorRespones.class);
         assertEquals(respones.getErrorCode(),"CP001");
         assertEquals(respones.getErrorMessage(),"Coupon not found or expire.");
     }
@@ -48,13 +54,15 @@ class PaymentControllerTest {
     @Test
     @DisplayName("ทดสอบการlist PaymentMethod ที่มีในระบบ")
     void listPaymentMethod() {
-        PaymentMethodEntity[] respones = testRestTemplate.getForObject("/api/payment/listpaymentmethod", PaymentMethodEntity[].class);
+        PaymentMethodEntity[] respones = testRestTemplate.getForObject(paymentmethodUrl, PaymentMethodEntity[].class);
         assertEquals(respones.length,3);
     }
 
     @Test
     @DisplayName("ทดสอบการจ่ายงเินขั้นตอนแรก")
     void prepayment(){
+        String username = "CustMock001";
+
         PaymentRequest paymentRequest = new PaymentRequest();
         AddressEntity address = new AddressEntity();
         address.setFullAddress("TestFull");
@@ -74,11 +82,11 @@ class PaymentControllerTest {
         purchaseList.add(purchase);
         paymentRequest.setPurchaseList(purchaseList);
 
-        ResponseEntity<PaymentEntity> payment = testRestTemplate.postForEntity("/api/payment/prepayment",paymentRequest, PaymentEntity.class);
+        ResponseEntity<PaymentEntity> payment = testRestTemplate.postForEntity(prepaymenUrl,paymentRequest, PaymentEntity.class);
         PaymentEntity paymentEntity = payment.getBody();
 
         assertEquals(payment.getStatusCode(), HttpStatus.OK);
         assertEquals(true,paymentEntity.getId() > 0);
-        assertEquals(paymentEntity.getUsername() ,"CustMock001");
+        assertEquals(paymentEntity.getUsername() ,username);
     }
 }
