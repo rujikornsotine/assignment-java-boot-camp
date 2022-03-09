@@ -11,7 +11,7 @@ import java.util.Optional;
 public class AuthenService {
 
     @Autowired
-    AuthenRepository authenRepository;
+    private AuthenRepository authenRepository;
 
     public void setAuthenRepository(AuthenRepository authenRepository) {
         this.authenRepository = authenRepository;
@@ -23,4 +23,6 @@ public class AuthenService {
         isAuthed = result.isPresent();
         return isAuthed;
     }
+
+
 }

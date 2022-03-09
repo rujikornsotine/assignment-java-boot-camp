@@ -1,11 +1,9 @@
 package com.example.assignmentjavabootcamp.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Data
@@ -19,8 +17,11 @@ public class AddressPayment  {
     private String subdistrict;
     private String zipcode;
     private String province;
-    private String username;
-    private String paymentrefnumber;
+
+    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name = "payment_id",nullable = false)
+    PaymentEntity payment;
 
     public AddressPayment() {
     }
@@ -33,7 +34,16 @@ public class AddressPayment  {
         this.subdistrict = address.getSubdistrict();
         this.zipcode = address.getZipcode();
         this.province = address.getProvince();
-        this.username = username;
-        this.paymentrefnumber = paymentrefnumber;
+
+    }
+
+    public AddressPayment(AddressEntity address,PaymentEntity payment) {
+        this.fullAddress = address.getFullAddress();
+        this.address = address.getAddress();
+        this.district = address.getDistrict();
+        this.subdistrict = address.getSubdistrict();
+        this.zipcode = address.getZipcode();
+        this.province = address.getProvince();
+        this.payment = payment;
     }
 }

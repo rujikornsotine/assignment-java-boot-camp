@@ -3,10 +3,7 @@ package com.example.assignmentjavabootcamp.Entity;
 import com.example.assignmentjavabootcamp.Service.PaymentService;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,22 +16,16 @@ public class PaymentEntity {
     private int id;
     private String refnumber;
     private String username;
-    private String paymentamount;
-    private String paymentmethodid;
-    private String accountnumber;
-    private String accountname;
-    private String accountexpire;
-    private String cvv;
-    private String firstname;
-    private String lastname;
-    //private List<PurchaseEntity> purchaseEntityList;
-    private LocalDateTime transactiondate;
-    private LocalDateTime expiredate;
-    private String barcode;
-    private double amount;
-    //private AddressEntity addressEntity;
-    private String paymentflow;
-    private String deliveryname;
+
+    @OneToOne(mappedBy = "payment",cascade = CascadeType.ALL)
+    private PaymentDetailEntity paymentDetail;
+
+   @OneToMany(mappedBy = "payment",cascade = CascadeType.ALL)
+   private List<ItemPayment> itemPayments;
+
+   @OneToOne(mappedBy = "payment",cascade = CascadeType.ALL)
+   private AddressPayment addressEntity;
+
 
 
     public PaymentEntity() {

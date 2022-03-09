@@ -35,8 +35,8 @@ class CustomerControllerTest {
     void getCustomerNotProfile() {
         String username = "CustMock002";
         ErrorRespones respones = testRestTemplate.getForObject(url+username, ErrorRespones.class);
-        assertEquals(respones.getErrorCode(),"0005");
-        assertEquals(respones.getErrorMessage(),"CustomerException : Username CustMock002 Not Found.");
+        assertEquals(respones.getErrorCode(),"C0001");
+        assertEquals(respones.getErrorMessage(),"Username CustMock002 Not Found.");
     }
 
 

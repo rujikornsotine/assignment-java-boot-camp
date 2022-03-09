@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemPaymentRepository extends JpaRepository<ItemPayment,Integer> {
-    List<ItemPayment> findByUsernameAndPaymentrefnumber(String username, String paymentrefnumber);
+   //Optional<List<ItemPayment>> findByUsernameAndPaymentrefnumber(String username, String paymentrefnumber);
 }

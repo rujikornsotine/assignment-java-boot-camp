@@ -2,13 +2,17 @@ package com.example.assignmentjavabootcamp.Service;
 
 import com.example.assignmentjavabootcamp.Entity.*;
 import com.example.assignmentjavabootcamp.Exception.CouponException;
+import com.example.assignmentjavabootcamp.Exception.CustomerException;
 import com.example.assignmentjavabootcamp.Exception.PaymentException;
+import com.example.assignmentjavabootcamp.Exception.ServiceErrorException;
 import com.example.assignmentjavabootcamp.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,46 +22,16 @@ import java.util.stream.Collectors;
 public class PaymentService {
 
     @Autowired
-    private AuthenRepository authenRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private PaymentMethodRepository paymentMethodRepository;
-    @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
-    private AddressPaymentRepository addressPaymentRepository;
+    private CustomerService customerService;
     @Autowired
-    private ItemPaymentRepository itemPaymentRepository;
+    private PaymentMethodService paymentMethodService;
     @Autowired
-    private CouponRepository couponRepository;
-
-    public void setAuthenRepository(AuthenRepository authenRepository) {
-        this.authenRepository = authenRepository;
-    }
-
-    public void setCustomerRepository(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
-    }
-
-    public void setPaymentMethodRepository(PaymentMethodRepository paymentMethodRepository) {
-        this.paymentMethodRepository = paymentMethodRepository;
-    }
+    private CouponService couponService;
 
     public void setPaymentRepository(PaymentRepository paymentRepository) {
         this.paymentRepository = paymentRepository;
-    }
-
-    public void setAddressPaymentRepository(AddressPaymentRepository addressPaymentRepository) {
-        this.addressPaymentRepository = addressPaymentRepository;
-    }
-
-    public void setItemPaymentRepository(ItemPaymentRepository itemPaymentRepository) {
-        this.itemPaymentRepository = itemPaymentRepository;
-    }
-
-    public void setCouponRepository(CouponRepository couponRepository) {
-        this.couponRepository = couponRepository;
     }
 
     private LocalDateTime dateTime;
@@ -67,32 +41,23 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentEntity Prepayment(String username, AddressEntity address, List<PurchaseEntity> purchaseList) throws PaymentException {
+    public PaymentEntity Prepayment(String username, AddressEntity address, List<PurchaseEntity> purchaseList) throws ServiceErrorException {
+
+        PaymentEntity paymentEntity = new PaymentEntity();
 
         if (username == null || username.isEmpty()) {
-            throw PaymentException.ParameterIsNotVaild("Username");
+            throw ServiceErrorException.ParameterIsNotVaild("Username");
         }
 
         if (purchaseList == null || purchaseList.isEmpty()) {
-            throw PaymentException.ProductNotFound();
+            throw ServiceErrorException.ProductNotFound();
         }
 
         if (address == null) {
-            throw PaymentException.AddressNotFound();
+            throw ServiceErrorException.AddressNotFound();
         }
 
-        Optional<CustomerEntity> customer = customerRepository.findByUsername(username);
-        if (customer.isEmpty()) {
-            throw PaymentException.CustomerNotFound();
-        }
-
-        Optional<AuthenEntity> authenEntity = authenRepository.findByUsername(username);
-        if (authenEntity.isEmpty()) {
-            throw PaymentException.Pleaselogin();
-        }
-
-        PaymentEntity paymentEntity = new PaymentEntity();
-        CustomerEntity cust = customer.get();
+        CustomerEntity cust = customerService.checkCustomerAuthen(username);
 
         if(purchaseList.size() > 0 ){
            long count = purchaseList.stream().filter( x -> x.getProductid() == null).count();
@@ -102,121 +67,106 @@ public class PaymentService {
 
         double amount = purchaseList.stream().mapToDouble(x -> x.getActual_price()).sum();
         String refnumber = GenarateRefPayment();
-        paymentEntity.setAmount(amount);
         paymentEntity.setUsername(username);
-        paymentEntity.setTransactiondate(LocalDateTime.now());
         paymentEntity.setRefnumber(refnumber);
-        paymentEntity.setFirstname(cust.getFirstname());
-        paymentEntity.setLastname(cust.getLastname());
-        paymentEntity.setPaymentflow(PaymentFlow.PRE_PAYMENT.toString());
+
+        PaymentDetailEntity paymentDetailEntity = new PaymentDetailEntity();
+        paymentDetailEntity.setAmount(amount);
+        paymentDetailEntity.setTransactiondate(LocalDateTime.now());
+        paymentDetailEntity.setFirstname(cust.getFirstname());
+        paymentDetailEntity.setLastname(cust.getLastname());
+        paymentDetailEntity.setPaymentflow(PaymentFlow.PRE_PAYMENT.toString());
+        paymentDetailEntity.setPayment(paymentEntity);
+
+        paymentEntity.setPaymentDetail(paymentDetailEntity);
+
+        paymentEntity.setAddressEntity(new AddressPayment(address,paymentEntity));
+
+        List<ItemPayment> itemPayments = new ArrayList<ItemPayment>();
+        for (var item : purchaseList) {
+           itemPayments.add(new ItemPayment(item,paymentEntity));
+        }
+        paymentEntity.setItemPayments(itemPayments);
 
         paymentRepository.save(paymentEntity);
-        addressPaymentRepository.save(new AddressPayment(address,username,refnumber));
-
-        for (var item : purchaseList) {
-            itemPaymentRepository.save(new ItemPayment(item,username,refnumber));
-        }
-
 
         return paymentEntity;
 
     }
 
     @Transactional
-    public PaymentEntity ConfirmPayment(String username, String couponcode, String refnumber, String paymentmethodid, String accountnumber, String accountname, String accountexpire, String cvv) throws PaymentException {
+    public PaymentEntity ConfirmPayment(String username, String couponcode, String refnumber, String paymentmethodid, String accountnumber, String accountname, String accountexpire, String cvv) throws  ServiceErrorException {
 
-        PaymentEntity payment = null;
+        PaymentEntity payment = new PaymentEntity();
+
         if (username.isEmpty()) {
-            throw PaymentException.ParameterIsNotVaild("Username");
+            throw ServiceErrorException.ParameterIsNotVaild("Username");
         }
 
         if (refnumber.isEmpty()) {
-            throw PaymentException.ParameterIsNotVaild("Refnumber");
+            throw ServiceErrorException.ParameterIsNotVaild("Refnumber");
         }
 
         if (paymentmethodid.isEmpty()) {
-            throw PaymentException.ParameterIsNotVaild("PaymentMethodID");
+            throw ServiceErrorException.ParameterIsNotVaild("PaymentMethodID");
         }
 
-        Optional<PaymentEntity> paymentEntity = paymentRepository.findByUsernameAndRefnumber(username,refnumber);
-        Optional<AddressPayment> optionalAddressPayment = addressPaymentRepository.findByUsernameAndPaymentrefnumber(username,refnumber);
-        List<ItemPayment> optionalItemPayment = itemPaymentRepository.findByUsernameAndPaymentrefnumber(username,refnumber);
+        payment = getByUsernameAndRefNumber(username,refnumber);
 
-        if(paymentEntity.isEmpty()){
-            throw PaymentException.PaymentMethodNotFound();
+
+
+        if(!payment.getPaymentDetail().getPaymentflow().equalsIgnoreCase(PaymentFlow.PRE_PAYMENT.toString())){
+            throw ServiceErrorException.PaymentInvalidFlow();
         }
 
-        if(paymentEntity.isPresent() ){
-            payment = paymentEntity.get();
-            if(!payment.getPaymentflow().equalsIgnoreCase(PaymentFlow.PRE_PAYMENT.toString())){
-                throw PaymentException.PaymentInvalidFlow();
-            }
-        }
+        //PaymentMethodService paymentMethodService = new PaymentMethodService();
+        PaymentMethodEntity paymentMethod = paymentMethodService.getPaymentMethodByID(paymentmethodid);
 
-
-        Optional<PaymentMethodEntity> paymentMethodEntity = paymentMethodRepository.findByPaymentmethodid(paymentmethodid);
-
-        if(paymentMethodEntity.isEmpty()){
-            throw PaymentException.PaymentMethodNotFound();
-        }
-
-        if(paymentMethodEntity.isPresent()){
-            PaymentMethodEntity paymentMethod = paymentMethodEntity.get();
-            payment.setPaymentmethodid(paymentMethod.getPaymentmethodid());
-
+        if(paymentMethod != null){
+            payment.getPaymentDetail().setPaymentmethodid(paymentMethod.getPaymentmethodid());
             if(paymentMethod.getPaymentname().equalsIgnoreCase(PaymentMethodName.CreditorDebit.toString())){
-                payment.setAccountnumber(accountnumber);
-                payment.setAccountname(accountname);
-                payment.setAccountexpire(accountexpire);
-                payment.setCvv(cvv);
+                payment.getPaymentDetail().setAccountnumber(accountnumber);
+                payment.getPaymentDetail().setAccountname(accountname);
+                payment.getPaymentDetail().setAccountexpire(accountexpire);
+                payment.getPaymentDetail().setCvv(cvv);
                 //call gateway
             }
-
-            if(paymentMethod.getPaymentname().equalsIgnoreCase(PaymentMethodName.CounterService.toString())){
-                payment.setBarcode("TestBarCode");
+            else if(paymentMethod.getPaymentname().equalsIgnoreCase(PaymentMethodName.CounterService.toString()))
+            {
+                payment.getPaymentDetail().setBarcode("TestBarCode");
                 //call CounterService gateway
             }
-
-            if(paymentMethod.getPaymentname().equalsIgnoreCase(PaymentMethodName.COD.toString())){
-                payment.setDeliveryname("J&T");
+            else if(paymentMethod.getPaymentname().equalsIgnoreCase(PaymentMethodName.COD.toString()))
+            {
+                payment.getPaymentDetail().setDeliveryname("J&T");
                 //call COD gateway
             }
 
-
-            payment.setPaymentflow(PaymentFlow.CONFIRM_PAYMENT.toString());
+            payment.getPaymentDetail().setPaymentflow(PaymentFlow.CONFIRM_PAYMENT.toString());
         }
 
         if(dateTime == null){
             dateTime = LocalDateTime.now();
         }
-        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireFalse(couponcode,dateTime);
 
-        if(paymentMethodEntity.isPresent()){
-            Coupon _coupon = coupon.get();
-            payment.setAmount(payment.getAmount() - _coupon.getDiscount());
-        }
+        Coupon coupon = couponService.CheckCoupon(couponcode);
+        payment.getPaymentDetail().setAmount(payment.getPaymentDetail().getAmount() - coupon.getDiscount());
 
         paymentRepository.save(payment);
 
-
         return payment;
-
     }
 
-    public Coupon CheckCoupon(String couponcode) throws CouponException {
-        if(dateTime == null){
-            dateTime = LocalDateTime.now();
-        }
-        Optional<Coupon> coupon = couponRepository.findByCouponcodeAndExpdateAfterAndIsexpireFalse(couponcode,dateTime);
-        if(coupon.isEmpty()){
-            throw CouponException.CouponNotFoundorExpire();
-        }
+    public PaymentEntity getByUsernameAndRefNumber(String username, String refnumber) throws ServiceErrorException
+    {
+      Optional<PaymentEntity> paymentEntity = paymentRepository.findByUsernameAndRefnumber(username,refnumber);
 
-        return coupon.get();
-    }
+      if(paymentEntity.isPresent() == false)
+      {
+          throw ServiceErrorException.PaymentNotFound();
+      }
 
-    public List<PaymentMethodEntity> ListPaymentMethod(){
-        return  paymentMethodRepository.findAll();
+      return paymentEntity.get();
     }
 
     private String GenarateRefPayment() {

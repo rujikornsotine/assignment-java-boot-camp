@@ -10,4 +10,5 @@ public class AddressEntity {
     private String subdistrict;
     private String zipcode;
     private String province;
+
 }

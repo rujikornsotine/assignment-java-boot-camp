@@ -2,6 +2,7 @@ package com.example.assignmentjavabootcamp.Controller;
 
 import com.example.assignmentjavabootcamp.Entity.CustomerEntity;
 import com.example.assignmentjavabootcamp.Exception.CustomerException;
+import com.example.assignmentjavabootcamp.Exception.ServiceErrorException;
 import com.example.assignmentjavabootcamp.Response.CustomerRespones;
 import com.example.assignmentjavabootcamp.Service.CustomerService;
 import org.apache.coyote.Response;
@@ -21,9 +22,9 @@ public class CustomerController {
     private CustomerService customerService;
 
     @GetMapping("/getprofile/{username}")
-    public ResponseEntity<CustomerRespones>  GetCustomerProfile(@PathVariable String username) throws CustomerException {
-       Optional<CustomerEntity> result = customerService.GetCustomerProfileByUsername(username);
-       CustomerRespones customerRespones = new CustomerRespones(result.get());
+    public ResponseEntity<CustomerRespones>  GetCustomerProfile(@PathVariable String username) throws ServiceErrorException {
+       CustomerEntity result = customerService.GetCustomerProfileByUsername(username);
+       CustomerRespones customerRespones = new CustomerRespones(result);
        return ResponseEntity.ok(customerRespones);
     }
 
